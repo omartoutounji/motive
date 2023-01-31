@@ -10,7 +10,9 @@ dependencies:
   flutter:
     sdk: flutter
   cupertino_icons: ^1.0.2
-  audioplayers: ^3.0.1
+  audio_service: ^0.18.9
+  just_audio: ^0.9.31
+  google_fonts: ^4.0.1
 
 dev_dependencies:
   flutter_test:
