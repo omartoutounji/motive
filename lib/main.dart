@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:audio_service/audio_service.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'dart:math';
 
 late AudioHandler _audioHandler;
 Future<void> main() async {
@@ -19,34 +18,46 @@ Future<void> main() async {
 
 class AudioPlayerHandler extends BaseAudioHandler {
   final _player = AudioPlayer();
+  List<AudioSource> songs = [];
 
   @override
   AudioPlayerHandler() {
-    int number = next(1, 19);
-
     // Broadcast that we're loading, and what controls are available.
     playbackState.add(playbackState.value.copyWith(
       controls: [MediaControl.play],
       processingState: AudioProcessingState.loading,
     ));
-    // Connect to the URL
-    _player
-        .setAudioSource(AudioSource.uri(
-            Uri.parse("asset:///assets/audio/$number.mp3"),
-            tag: MediaItem(
-                id: '$number',
-                title: "Motive",
-                album: "Motive",
-                artUri: Uri.parse("asset:///assets/icon/motive.png"))))
-        .then((_) {
-      // Broadcast that we've finished loading
-      playbackState.add(playbackState.value.copyWith(
-        processingState: AudioProcessingState.ready,
-      ));
-    });
-  }
 
-  int next(int min, int max) => min + Random().nextInt(max - min);
+    // Loop through audio assets, convert them to AudioSource objects and add them to songs list
+    for (var i = 1; i < 19; i++) {
+      songs.add(AudioSource.uri(Uri.parse("asset:///assets/audio/$i.mp3"),
+          tag: MediaItem(
+              id: '$i',
+              title: "Motive",
+              album: "Motive",
+              artUri: Uri.parse("asset:///assets/icon/motive.png"))));
+    }
+
+    // Define the playlist
+    final playlist = ConcatenatingAudioSource(
+      // Start loading next item just before reaching it
+      useLazyPreparation: true,
+      // Customise the shuffle algorithm
+      shuffleOrder: DefaultShuffleOrder(),
+
+      // Link the songs list to children
+      children: songs,
+    );
+
+    // Set the audio source as the playlist
+    _player.setAudioSource(playlist,
+        initialIndex: 0, initialPosition: Duration.zero);
+
+    // Broadcast that we've finished loading
+    playbackState.add(playbackState.value.copyWith(
+      processingState: AudioProcessingState.ready,
+    ));
+  }
 
   @override
   Future<void> play() async {
