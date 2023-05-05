@@ -1,7 +1,7 @@
 name: motive
 description: 'motive - nano motivation removes all the unnecessary fluff to focus on one thing only and one thing only, getting you as motivated as ever right away with just a tap.'
 publish_to: 'none'
-version: 1.1.0+1
+version: 1.2.0+1
 
 environment:
   sdk: '>=2.19.0 <3.0.0'
